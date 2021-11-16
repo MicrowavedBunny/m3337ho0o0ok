@@ -1,13 +1,16 @@
+#include "mh_defs.hpp"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
 #include <string>
 #include <vector>
+#include "game_exe_interface.hpp"
+
 #include <meathook_interface.h>
 #include <windows.h>
 #include "cmdsystem.hpp"
-#include "game_exe_interface.hpp"
 #include "doomoffs.hpp"
 #include "meathook.h"
 #include "cmdsystem.hpp"

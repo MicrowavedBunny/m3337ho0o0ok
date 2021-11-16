@@ -1,9 +1,17 @@
+#include "xbyak/xbyak.h"
+
+#include "mh_defs.hpp"
+
 #include <Windows.h>
 #include <intrin.h>
 #include "game_exe_interface.hpp"
+#include "snaphakalgo.hpp"
+#include <mutex>
+#include "scanner_core.hpp"
 static HMODULE g_reach_module = nullptr;
 
 blamdll_t g_blamdll{};
+
 
 struct patched_memory_t;
 
@@ -41,6 +49,7 @@ bool undo_last_patch() {
 void patch_memory(void* location, unsigned size, char* patched_data) {
 	patch_memory_impl(location, patched_data, size);
 }
+MH_NOINLINE
 patched_memory_t* patch_memory_with_undo(void* location, unsigned size, char* patched_data) {
 	patched_memory_t* patch = new patched_memory_t(location, size, patched_data);
 	patch_memory_impl(location, patched_data, size);
@@ -54,7 +63,7 @@ uintptr_t get_reach_base() {
 	return reinterpret_cast<uintptr_t>(g_reach_module);
 }
 
-
+MH_NOINLINE
 void init_reach() {
 	if (g_reach_module == nullptr) {
 		g_reach_module = GetModuleHandleA("DOOMEternalx64vk.exe");
@@ -64,72 +73,34 @@ void init_reach() {
 
 }
 
-
+MH_NOINLINE
 patched_memory_t* redirect_to_func(void* hookfn, uintptr_t reachaddr, bool direct) {
 
 	auto oldfunc = reachaddr;
 
-	// DWORD unprotect;
-   //  VirtualProtect((void*)oldfunc, 4096, PAGE_EXECUTE_READWRITE, &unprotect);
-
-	char dabytes[] = {
-	   0x48, 0xb8, 0,0,0,0, 0,0,0,0,0x50, 0xc3
+	static char dabytes[] = {
+	   0x48, (char)0xb8, 0,0,0,0, 0,0,0,0,0x50, (char)0xc3
 	};
 
 	*reinterpret_cast<void**>(&dabytes[2]) = hookfn;
 	return patch_memory_with_undo((void*)oldfunc, sizeof(dabytes), dabytes);
 
-	// memcpy((void*)oldfunc, dabytes, sizeof(dabytes));
 }
 
-
+MH_NOINLINE
 void redirect_to_func_save_rax(void* hookfn, uintptr_t reachaddr) {
-	char dabytes[] = { 0x50, 0x48, 0xB8, 0x32, 0x89, 0x04, 0x39, 0xFF, 0x7F, 0x00, 0x00, 0xFF, 0xE0 };
-	// DWORD unprotect;
+	static char dabytes[] = { 0x50, 0x48, (char)0xB8, 0x32, (char)0x89, 0x04, 0x39, (char)0xFF, (char)0x7F, 0x00, 0x00, (char)0xFF, (char)0xE0 };
 	*reinterpret_cast<void**>(&dabytes[3]) = hookfn;
 
 	patch_memory_with_undo((void*)reachaddr, sizeof(dabytes), dabytes);
 
-	/* VirtualProtect((void*)reachaddr, 4096, PAGE_EXECUTE_READWRITE, &unprotect);
-
-	   memcpy((void*)reachaddr, dabytes, sizeof(dabytes));*/
 
 }
 
 
-static unsigned* locate_tlsindex_ptr() {
-	char* ntdllc = reinterpret_cast<char*>(get_reach_base());
 
-	auto base = reinterpret_cast<IMAGE_DOS_HEADER*>(get_reach_base());
-	auto winheader = reinterpret_cast<IMAGE_NT_HEADERS*>(ntdllc + base->e_lfanew);
-
-
-	auto exports_ptr = reinterpret_cast<unsigned**>(ntdllc + winheader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_TLS].VirtualAddress)[2];
-
-	return exports_ptr;
-
-	//auto exps  = reinterpret_cast<_IMAGE_EXPORT_DIRECTORY*>(exports_ptr);
-}
-
-static void* locate_tls_page() {
-	char* ntdllc = reinterpret_cast<char*>(get_reach_base());
-
-	auto base = reinterpret_cast<IMAGE_DOS_HEADER*>(get_reach_base());
-	auto winheader = reinterpret_cast<IMAGE_NT_HEADERS*>(ntdllc + base->e_lfanew);
-
-
-	auto exports_ptr = reinterpret_cast<void**>(ntdllc + winheader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_TLS].VirtualAddress)[0];
-
-	return exports_ptr;
-
-	//auto exps  = reinterpret_cast<_IMAGE_EXPORT_DIRECTORY*>(exports_ptr);
-}
-
-
-
+MH_NOINLINE
 void swap_out_ptrs(void* start_addr, void** repls, unsigned n, bool dont_want_replaced) {
-	DWORD old;
-	//VirtualProtect(start_addr, n*8, PAGE_READWRITE, &old);
 
 	void** temp = new void* [n];
 
@@ -145,7 +116,6 @@ void swap_out_ptrs(void* start_addr, void** repls, unsigned n, bool dont_want_re
 	}
 	patch_memory_with_undo(start_addr, n * 8, (char*)temp);
 	delete[] temp;
-	//VirtualProtect(start_addr, n*8, old, &old);
 
 }
 
@@ -156,7 +126,7 @@ void get_blamdll_info(blamdll_t* out) {
 	char* ntdllc = reinterpret_cast<char*>(get_reach_base());
 	auto base = reinterpret_cast<IMAGE_DOS_HEADER*>(get_reach_base());
 	auto winheader = reinterpret_cast<IMAGE_NT_HEADERS*>(ntdllc + base->e_lfanew);
-
+#if 0
 	out->image_headers = winheader;
 	out->text_base = ntdllc +
 		winheader->OptionalHeader.BaseOfCode;
@@ -196,6 +166,7 @@ void get_blamdll_info(blamdll_t* out) {
 		out->arch_base = out->data_base;
 		out->arch_size = out->data_size;
 	}
+#endif
 	/*
 	out->rdata_base = ntdllc + winheader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress +  winheader->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].Size;
 
@@ -216,52 +187,93 @@ void undo_all_reach_patches() {
 		;
 }
 
-void** locate_func_in_imports(void* wantfunc) {
-	char* p = g_blamdll.idata_base;
 
-	char* end = g_blamdll.idata_size+p;
+static std::mutex g_execmem_lock{};
+static HANDLE g_execmem_heap=nullptr;
+
+void* alloc_execmem(size_t size) {
+	#if 1
+	g_execmem_lock.lock();
+
+	if(!g_execmem_heap) {
+		g_execmem_heap = HeapCreate(HEAP_CREATE_ENABLE_EXECUTE, 0, 0);
+
+	}
+
+	void* result = HeapAlloc(g_execmem_heap, 0, size + 32);
+
+
+
+	g_execmem_lock.unlock();
+	return result;
 
 	
-	while(p!= end) {
-		
-		if(reinterpret_cast<void**>(p)[0] == wantfunc )
-			return (void**)p;
-		p+=8;
-	}
-	return nullptr;
-}
-#include <WINNT.H>
-void** locate_import_ptr(const char* impname) {
-	auto ntdllc = g_blamdll.image_base;
-#if 0
-	auto exports_ptr = g_blamdll.image_base + g_blamdll.image_headers->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT].VirtualAddress;
-	auto exps  = reinterpret_cast<IMAGE_IMPORT_MODULE_DIRECTORY *>(exports_ptr);
-
-	auto names = reinterpret_cast<unsigned*>(exps->AddressOfNames + ntdllc);
-	auto funcs = reinterpret_cast<unsigned*>(exps->AddressOfFunctions + ntdllc);
-
-	
-	unsigned nfuncs = exps->NumberOfFunctions;
-	unsigned nnames = exps->NumberOfNames;
-
-	unsigned short* ords = reinterpret_cast<unsigned short*>(exps->AddressOfNameOrdinals + ntdllc);
-
-
-	for(unsigned i = 0; i < nnames; ++i) {
-		char* nam = names[i] + ntdllc;
-		if(!strcmp(nam, impname)) {
-
-		//auto xlat = find_syscall(nam);
-	//	if(xlat == nullptr)
-		//	continue;
-			unsigned ord = ords[i];
-
-			auto funcptr = funcs[ord] + ntdllc;
-			return (void**)funcptr;
-		}
-		//int swi = extract_syscall((unsigned int*)funcptr);
-	//	g_translated_syscalls[xlat->swicode] = get_syscall_ptr_of_code(swi);
-	}
+#else
+	return VirtualAlloc(nullptr, size, MEM_RESERVE|MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 #endif
-	return nullptr;
+}
+
+
+void* detour_with_thunk_for_original(void* detour_from, void* detour_to, bool use_r9_instead) {
+	Xbyak::CodeGenerator redirector{};
+	Xbyak::CodeGenerator reporiginal_thunk{};
+	redirector.mov(redirector.rax, (uintptr_t)detour_to);
+	redirector.jmp(redirector.rax);
+
+
+	auto redirector_reg = use_r9_instead ? redirector.r9 : redirector.rax;
+
+
+	mh_disassembler_t disas{};
+	void* original_getfile_continuation = nullptr;
+	size_t savesize = 0;
+	disas.decode_enough_to_make_space(detour_from, redirector.getSize(), &original_getfile_continuation, &savesize);
+
+
+	Xbyak::CodeGenerator original_thunk{};
+
+	original_thunk.mov(redirector_reg, (uintptr_t)original_getfile_continuation);
+	original_thunk.jmp(redirector_reg);
+
+
+
+	void* g_original_ds_getfile = alloc_execmem(original_thunk.getSize() + savesize + 32);
+	size_t setupsize = savesize;
+
+	memcpy(g_original_ds_getfile, detour_from, setupsize);
+
+	disas.setup_for_addr(g_original_ds_getfile, 128);
+
+	Xbyak::CodeGenerator* to_use = &original_thunk;
+
+	if (disas.find_next_call(setupsize)) {
+		if(disas.get_call_target() == descan::g_alloca_probe) {
+		memset((void*)(disas.m_ctx.pc - 5), 0x90, 5);
+
+
+
+		reporiginal_thunk.mov(redirector_reg, (uintptr_t)descan::g_alloca_probe);
+		reporiginal_thunk.call(redirector_reg);
+
+		reporiginal_thunk.mov(redirector_reg, (uintptr_t)original_getfile_continuation);
+		reporiginal_thunk.jmp(redirector_reg);
+
+		to_use = &reporiginal_thunk;
+		}
+		else {
+			mh_error_message("Unimplemented call redirect handler!");
+			return nullptr;
+		}
+
+
+
+	}
+
+	memcpy(mh_lea<char>(g_original_ds_getfile, savesize), to_use->getCode(), to_use->getSize());
+
+
+	//g_original_ds_getfile now has the bytes we will clobber on the original + the instructions to jump back to the function, past the part we overwrote
+
+	patch_memory(detour_from, redirector.getSize(), (char*)redirector.getCode());
+	return g_original_ds_getfile;
 }

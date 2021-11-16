@@ -14,6 +14,7 @@ MH_OPAQUE(mh_enumval_t);
 */
 MH_OPAQUE(mh_game_entity_t);
 
+typedef void (*mh_mainloop_cb_t)(void*);
 /*
 	struct with pointers instead of virtual to ensure mingw compat
 */
@@ -56,4 +57,19 @@ struct mh_interface_t {
 	size_t (*m_classvar_offset)(mh_classvar_t var);
 
 	mh_game_entity_t (*m_find_entity_by_name)(const char* entity_name);
+
+	unsigned m_sizeof_generalized_number;
+	unsigned m_pad;
+
+	mh_game_entity_t (*m_find_next_entity_with_class)(const char* classname, mh_game_entity_t after);
+
+	const char* (*m_get_entity_name)(mh_game_entity_t ent);
+	void (*m_add_persistent_text)(unsigned x, unsigned y, unsigned RGBA, float scale,  const char* fmt, ...);
+
+	void (*m_remove_persistent_text)(unsigned x, unsigned y);
+	mh_game_entity_t (*m_get_player1)();
+	mh_game_entity_t (*m_get_player_looktarget)();
+
+	void (*m_register_premainloop_cb)(mh_mainloop_cb_t cb, void* ud);
+	void (*m_register_postmainloop_cb)(mh_mainloop_cb_t cb, void* ud);
 };

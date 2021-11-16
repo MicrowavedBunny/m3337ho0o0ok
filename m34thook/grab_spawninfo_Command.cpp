@@ -1,3 +1,5 @@
+#include "mh_defs.hpp"
+
 #include "game_exe_interface.hpp"
 #include "doomoffs.hpp"
 #include "meathook.h"
@@ -9,6 +11,8 @@
 #include <cmath>
 #include <cstdlib>
 #include <cstdio>
+#include <snaphakalgo.hpp>
+#if 0
 namespace idMath {
 void SinCos(float a, float& s, float& c)
 {
@@ -20,12 +24,15 @@ void SinCos(float a, float& s, float& c)
 	c = cosf(a);
 
 }
+
 const float	PI				= 3.14159265358979323846f;
 
 const float	M_DEG2RAD		= PI / 180.0f;
 const float	M_RAD2DEG		= 180.0f / PI;
 
 }
+
+#endif
 struct idVec3 {
 	float x, y, z;
 	void Set(float _x, float _y, float _z){
@@ -47,18 +54,18 @@ public:
 	idMat3 ToMat3() const;
 };
 
-#define DEG2RAD(a)				( (a) * idMath::M_DEG2RAD )
+//#define DEG2RAD(a)				( (a) * idMath::M_DEG2RAD )
 
 idMat3 idAngles::ToMat3() const
 {
 	idMat3 mat;
-	float sr, sp, sy, cr, cp, cy;
-
+	double sr, sp, sy, cr, cp, cy;
+	using namespace sh::math;
 	
-
-	idMath::SinCos( DEG2RAD( yaw ), sy, cy );
-	idMath::SinCos( DEG2RAD( pitch ), sp, cp );
-	idMath::SinCos( DEG2RAD( roll ), sr, cr );
+	
+	sincos( DEG2RAD( yaw ), sy, cy );
+	sincos( DEG2RAD( pitch ), sp, cp );
+	sincos( DEG2RAD( roll ),sr, cr );
 
 	mat.mat[ 0 ].Set( cp * cy, cp * sy, -sp );
 	mat.mat[ 1 ].Set( sr * sp * cy + cr * -sy, sr * sp * sy + cr * cy, sr * cp );
@@ -135,7 +142,7 @@ void cmd_mh_ang2mat(idCmdArgs* args) {
 	if (args->argc > 3) {
 		inv3 = atof(args->argv[3]);
 	}
-	idAngles angles{ inv1, inv2, inv3 };
+	idAngles angles{ (float)inv1, (float)inv2, (float)inv3 };
 	idMat3 mat = angles.ToMat3();
 	//copypaste
 	const char* fmtstr = "{\n\tmat = {\n\t\tmat[0] = {\n\t\t\tx = %f;\n\t\t\ty = %f;\n\t\t\tz = %f;\n\t\t}\n\t\tmat[1] = {\n\t\t\tx = %f;\n\t\t\ty = %f;\n\t\t\tz=%f;\n\t\t}\n\t\tmat[2] = {\n\t\t\tx = %f;\n\t\t\ty = %f;\n\t\t\tz = %f;\n\t\t}\n\t}\n}\n";

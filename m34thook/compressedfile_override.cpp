@@ -1,3 +1,5 @@
+#include "mh_defs.hpp"
+
 #include "game_exe_interface.hpp"
 #include "doomoffs.hpp"
 #include "idStr.hpp"
@@ -138,7 +140,11 @@ void* __fastcall idFileResourceCompressed__GetFile(__int64 a1)
 			0i64,
 			16,
 			-1);
-		assert(call_as<bool>(descan::g_idoodle_decompress, *(_QWORD*)(a1 + 88), *(_QWORD*)(a1 + 96), v5, v1, 0xDu));
+		{
+			bool decompress_result = call_as<bool>(descan::g_idoodle_decompress, *(_QWORD*)(a1 + 88), *(_QWORD*)(a1 + 96), v5, v1, 0xDu);
+
+			assert(decompress_result);
+		}
 	//	assert(doomcall<bool>(doomoffs::_ZN7idOodle16DecompressBufferEPKvxPvxNS_12compressor_tE, *(_QWORD*)(a1 + 88), *(_QWORD*)(a1 + 96), v5, v1, 0xDu));
 	donezo:
 		sub_14033ECC0(v4, v5, v1);

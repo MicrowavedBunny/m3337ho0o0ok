@@ -1,6 +1,8 @@
 #pragma once
 struct idEventDefInterfaceLocal;
 #include "idStr.hpp"
+
+struct idEventDef;
 struct idEventDefInterfaceLocalVftbl
 {
   void *(__fastcall  *dctor)(void *Memory, char a2);
@@ -30,6 +32,8 @@ struct idEventDefInterfaceLocal {
 		return vftbl->_ZNK24idEventDefInterfaceLocal18GetEventNameForNumEi(this, evtnum);
 	}
 
+
+
 	unsigned GetNumEventArgs(unsigned evtnum) {
 		return vftbl->_ZNK24idEventDefInterfaceLocal15GetNumEventArgsEi(this, evtnum);
 	}
@@ -41,8 +45,45 @@ struct idEventDefInterfaceLocal {
 	}
 
 
+	idEventDef* FindEvent(const char* name) {
+
+		return (idEventDef*) vftbl->_ZNK24idEventDefInterfaceLocal9FindEventEPKc(this, (long long)name);
+	}
+	idEventDef* GetEventForNum(unsigned idx) {
+		//ewww 
+		return FindEvent(GetEventNameForNum(idx));
+	}
 	static idEventDefInterfaceLocal* Singleton();
 };
 
 
-void DumpEventDefs();
+void DumpEventDefs(bool as_enum);
+enum eventType_t
+{
+	EVENT_GAME = 0x0,
+	EVENT_ACTION = 0x1,
+	EVENT_ANIMEVENT = 0x2,
+	EVENT_FSMEVENT = 0x3,
+	EVENT_NOTICE = 0x4,
+	EVENT_SSACTION = 0x5,
+};
+
+struct idEventDef {
+	char* name;
+	char* formatspec;
+	char* argTypes;
+	char* argNames;
+	char* argDefaultValues;
+	int returnType;
+	int numargs;
+	int numstrings;
+	int eventnum;
+	int flags;
+	eventType_t type;
+	char* timelineEventGroup;
+	char* comment;
+	idEventDef* noticeEvent;
+	idEventDef* next;
+	//copied from decompilation, for reimplementing scriptcmdent
+	bool GetArgTypeName(int arg, std::string* tname);
+};

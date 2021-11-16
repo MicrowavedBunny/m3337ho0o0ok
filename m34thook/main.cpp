@@ -1,3 +1,5 @@
+#include "mh_defs.hpp"
+
 #include <Windows.h>
 #include "game_exe_interface.hpp"
 #include "memscan.hpp"
@@ -5,11 +7,47 @@
 #include "meathook.h"
 #include "scanner_core.hpp"
 #include "fs_hooks.hpp"
-
+#include "snaphakalgo.hpp"
 //#define		SUPPORT_NEWER_VERSIONS
+MH_NOINLINE
+void mh_error_message(const char* fmt, ...) {
+	va_list ap;
+	va_start(ap, fmt);
+	char errbuf[65536];
+	vsprintf_s(errbuf, fmt, ap);
 
+	MessageBoxA(nullptr, errbuf, "M347h00k Error", MB_ICONERROR);
+
+	va_end(ap);
+}
+CS_COLD_CODE
+CS_NOINLINE
+CS_NORETURN
+void cs::_cs_assert_fail_raise(const cs::cs_assert_fail_descr_t* descr) {
+
+	char errbuff[4096] = { 0 };
+
+	strncpy(errbuff, "Assertion failed in function ", sizeof(errbuff));
+	char line_text[32];
+
+	//itoa(descr->line_no, line_text, 10);
+
+	strncat(errbuff, descr->fn_name, sizeof(errbuff));
+	strncat(errbuff, line_text, sizeof(errbuff));
+
+	strncat(errbuff, " in file ", sizeof(errbuff));
+
+	strncat(errbuff, descr->_file_name, sizeof(errbuff));
+
+
+	MessageBoxA(nullptr, errbuff, "M347h00k Assertion Failure", MB_ICONERROR);
+
+	
+
+
+}
 static HMODULE g_real_xinput = nullptr;
-
+snaphak_algo_t g_shalgo{};
 __declspec(noinline)
 static void init_xinput() {
 	char tmpbuf[512];
@@ -34,7 +72,7 @@ static HMODULE get_real_xinput() {
 
 static void* xinputgetstate_ptr = nullptr;
 static void* xinputsetstate_ptr = nullptr;
-
+  
 extern "C"
 __declspec(dllexport)
 
@@ -64,15 +102,24 @@ DWORD XInputSetState(
 	return reinterpret_cast<DWORD(*)(DWORD, void*)>(xinputsetstate_ptr)(dwUserIndex, pVibration);
 }
 static  void* original_gamelib_init = nullptr;
+static std::atomic_bool g_did_gamelib_init_already = false;
+
 static int gamelib_init_forwarder(void* x, void* y) {
 
+	if(g_did_gamelib_init_already.exchange(true) == false) {
+		descan::run_late_scangroups();
 
+		int result = reinterpret_cast<int (*)(void*, void*)>(original_gamelib_init)(x, y);///doomcall<int>(doomoffs::gamelib_initialize, x, y);
 
-	int result = reinterpret_cast<int (*)(void*, void*)>(original_gamelib_init)(x, y);///doomcall<int>(doomoffs::gamelib_initialize, x, y);
-	meathook_init();
+		//descan::run_gamelib_postinit_scangroups();
+		meathook_init();
 
-	hook_idfilesystem();
-	return result;
+		hook_idfilesystem();
+		return result;
+	}
+	else {
+		return 0;
+	}
 
 }
 static bool g_did_init = false;
@@ -84,7 +131,7 @@ static void* g_kernel32_getsysinfo_ptr = nullptr;
 static void patch_engine_after_unpack() {
 
 	descan::locate_critical_features();
-
+	
 	void* gamelib_init_addr = descan::g_gamelib_initialize_ptr;
 
 	void** ourguy = (void**)(gamelib_init_addr);
@@ -93,11 +140,15 @@ static void patch_engine_after_unpack() {
 	*ourguy = (void*)gamelib_init_forwarder;
 }
 
+static std::atomic_bool g_did_sysinf_hook_already = false;
+
 static void getsysinf(LPSYSTEM_INFO inf) {
 
 	reinterpret_cast<void (*)(LPSYSTEM_INFO)>(GetProcAddress(GetModuleHandleA("KernelBase.dll"), "GetSystemInfo"))(inf);
 	patch_memory(g_kernel32_getsysinfo_ptr, 16, g_old_getsysteminfo_bytes);
-	patch_engine_after_unpack();
+	FlushInstructionCache(GetCurrentProcess(), nullptr, 0);
+	if(g_did_sysinf_hook_already.exchange(true) == false)
+		patch_engine_after_unpack();
 }
 //static HMODULE g_idt7 = nullptr;
 BOOL WINAPI DllMain(
@@ -105,8 +156,12 @@ BOOL WINAPI DllMain(
 	_In_ DWORD     fdwReason,
 	_In_ LPVOID    lpvReserved
 ) {
+	if(DLL_PROCESS_DETACH == fdwReason) {
+		undo_all_reach_patches();
+	}
 	if (g_did_init)
 		return TRUE;
+	sh_algo_init(&g_shalgo);
 	g_did_init = true;
 
 	init_reach();
@@ -114,7 +169,7 @@ BOOL WINAPI DllMain(
 	memcpy(g_old_getsysteminfo_bytes, g_kernel32_getsysinfo_ptr, 16);
 
 	redirect_to_func((void*)getsysinf, (uintptr_t)g_kernel32_getsysinfo_ptr, true);
-
+	FlushInstructionCache(GetCurrentProcess(), nullptr, 0);
 	return TRUE;
 }
 static void* xinputgetcaps_ptr = nullptr;

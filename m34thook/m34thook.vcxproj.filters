@@ -16,6 +16,36 @@
     <Filter Include="Header Files\scanners">
       <UniqueIdentifier>{f563642e-5e3c-49b8-b9a5-558138a8049e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\xbyak">
+      <UniqueIdentifier>{dc3f1388-cb82-46c8-9257-024445c4e178}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\scanner_inls">
+      <UniqueIdentifier>{a000585c-b95f-4fe2-a513-407870384757}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\mhutil">
+      <UniqueIdentifier>{366a52cf-634b-498d-bfd0-e6e46cc00e04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\mhutil">
+      <UniqueIdentifier>{1306382e-248a-46fb-84a8-3b5abab979a5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\win32">
+      <UniqueIdentifier>{89c418ce-1607-4322-b6d4-3a696c351f12}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\optimizations">
+      <UniqueIdentifier>{f64397e4-406c-4882-8a14-9bd89cd626cb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\pregenerated">
+      <UniqueIdentifier>{a69d6faa-1d81-4171-a049-334a7134bae4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\pregenerated">
+      <UniqueIdentifier>{6a6a4a19-4e77-4f69-84df-3480342a49cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\objfiles">
+      <UniqueIdentifier>{3068534c-bf59-42d7-863b-c36cce1cb0be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\objfiles">
+      <UniqueIdentifier>{9772d6ec-8240-4817-a58e-45381c52a673}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -59,6 +89,96 @@
     </ClCompile>
     <ClCompile Include="errorhandling_hooks.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gameapi.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mh_native_api.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="memscan.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="thunkstrementer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mh_dev_hooks.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mh_memmanip_cmds.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="id_resources_lowlevel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="rendermodelgui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mhgui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mh_inputsys.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mh_guirender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mh_mainloop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="scanners\scanners_avx2.cpp">
+      <Filter>Source Files\scanner_inls</Filter>
+    </ClCompile>
+    <ClCompile Include="scanners\scanners_avx512.cpp">
+      <Filter>Source Files\scanner_inls</Filter>
+    </ClCompile>
+    <ClCompile Include="scanners\scanners_generic.cpp">
+      <Filter>Source Files\scanner_inls</Filter>
+    </ClCompile>
+    <ClCompile Include="mhutil\mh_filesystem.cpp">
+      <Filter>Source Files\mhutil</Filter>
+    </ClCompile>
+    <ClCompile Include="optimizations\mhoptimize.cpp">
+      <Filter>Source Files\optimizations</Filter>
+    </ClCompile>
+    <ClCompile Include="mh_staticmodel.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mh_editor_mode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mh_kwsearch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pregenerated\doom_eternal_properties_generated.cpp">
+      <Filter>Source Files\pregenerated</Filter>
+    </ClCompile>
+    <ClCompile Include="mh_headergen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pregenerated\doom_eternal_cvars_generated.cpp">
+      <Filter>Source Files\pregenerated</Filter>
+    </ClCompile>
+    <ClCompile Include="mh_cmds_spawning.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mh_cmds_cheats.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mh_cmds_queries.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mh_cmds_editor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mh_cmds_dump_and_gen.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="mh_cmds_misc_and_dev.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="objfiles\objloader.cpp">
+      <Filter>Source Files\objfiles</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -104,17 +224,8 @@
     <ClInclude Include="scanner_core.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="declare_vtbl_feature_vars.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="define_vtbl_feature_vars.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="scanners\scanners_typeinfo.hpp">
       <Filter>Header Files\scanners</Filter>
-    </ClInclude>
-    <ClInclude Include="meathook_plugin_api.hpp">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="clipboard_helpers.hpp">
       <Filter>Header Files</Filter>
@@ -127,6 +238,102 @@
     </ClInclude>
     <ClInclude Include="errorhandling_hooks.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gameapi.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mh_native_api.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="xmacro_scanned_features.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="idmath.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mh_defs.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="generalized_number.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="xbyak\xbyak.h">
+      <Filter>Header Files\xbyak</Filter>
+    </ClInclude>
+    <ClInclude Include="xbyak\xbyak_bin2hex.h">
+      <Filter>Header Files\xbyak</Filter>
+    </ClInclude>
+    <ClInclude Include="xbyak\xbyak_mnemonic.h">
+      <Filter>Header Files\xbyak</Filter>
+    </ClInclude>
+    <ClInclude Include="xbyak\xbyak_util.h">
+      <Filter>Header Files\xbyak</Filter>
+    </ClInclude>
+    <ClInclude Include="mh_dev_hooks.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mh_memmanip_cmds.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="id_resources_lowlevel.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="scanners\initial_scangroup.hpp">
+      <Filter>Header Files\scanners</Filter>
+    </ClInclude>
+    <ClInclude Include="scanners\secondary_scangroup.hpp">
+      <Filter>Header Files\scanners</Filter>
+    </ClInclude>
+    <ClInclude Include="scanners\tertiary_scangroup.hpp">
+      <Filter>Header Files\scanners</Filter>
+    </ClInclude>
+    <ClInclude Include="mhgui.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="scanners\scanner_core_incl.hpp">
+      <Filter>Header Files\scanners</Filter>
+    </ClInclude>
+    <ClInclude Include="mh_inputsys.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mh_guirender.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mh_mainloop.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mhutil\mh_filesystem.hpp">
+      <Filter>Header Files\mhutil</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\ntdll.h">
+      <Filter>Header Files\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="xmacro_mh_config.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mh_staticmodel.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="mh_editor_mode.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rapiddecl.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pregenerated\doom_eternal_properties_generated.hpp">
+      <Filter>Header Files\pregenerated</Filter>
+    </ClInclude>
+    <ClInclude Include="mh_headergen.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pregenerated\doom_eternal_cvars_generated.hpp">
+      <Filter>Header Files\pregenerated</Filter>
+    </ClInclude>
+    <ClInclude Include="mh_editor_math.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="objfiles\objloader.h">
+      <Filter>Header Files\objfiles</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
