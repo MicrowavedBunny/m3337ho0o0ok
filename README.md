@@ -1,4 +1,6 @@
-Forked/copied from FishnCrisps, with latest pull request applied (for Doom Eternal v6.0 support). This repository is not actively maintained, and exists for archival/backup purposes.
+### Meathook v7.1
+
+This version of Meathook was created by chrispy. It was released on November 15, 2021. I take no credit for the creation of this tool.
 
 ### Instructions
 
@@ -6,21 +8,21 @@ Copy the "XINPUT1_3.dll" file into your Doom Eternal directory. Overwrite the ex
 
 ### Known Issues with Game Update v6.66
 
-- `chrispy` command doesn't work properly, entities are spawned at coords 0, 0, 0. 
-- `mh_optimize` command has been removed due to crash/instability.
+Certain mods may cause the game to crash with an Engine Error. An example of the error is:
+`component 20 (aicomponent/jetpack/revenant_test)` on 'master_level_ai_heavy_revenant_retro' has an invalid component id`
+
+If you encounter this error, please notify the mod creator. You will either need to remove meathook or downgrade to a previous version of meathook to resolve the issue.
 
 ### Changelog
 
-- Add compatibility with EternalModInjector online safety features
-- Fix stability/crash issue with `mh_active_encounter` command
-- Removed `mh_optimize` command due to crash/instability.
+- Fixes `chrispy` command which broke in v6.66 game update
+- Adds several new commands, use `find mh_` in console to see a list.
 
-### Console Commands
+### Console Commands (NOT YET UPDATED FOR v7.1)
 
 Command | Description
 ------------ | -------------
 chrispy | chrispy \<entitydef\> \<optional xyz position\> - spawns an entity at the position
-gibalicious | Instantly gibs all AI in the world
 idlib_dump | idlib_dump
 mh_active_encounter | Get the list of active encounter managers
 mh_ang2mat | mh_ang2mat pitch yaw roll : converts the pitch, yawand roll values for idAngles to a decl - formatted matrix, copying the result to your clipboard
