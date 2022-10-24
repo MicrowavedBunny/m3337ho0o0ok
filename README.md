@@ -1,4 +1,4 @@
-### Meathook v7.1
+### Meathook v7.2
 
 This version of Meathook was created by chrispy. It was released on November 15, 2021. I take no credit for the creation of this tool.
 
@@ -11,7 +11,7 @@ Copy the "XINPUT1_3.dll" file into your Doom Eternal directory. Overwrite the ex
 Certain mods may cause the game to crash with an Engine Error. An example of the error is:
 `component 20 (aicomponent/jetpack/revenant_test) on 'master_level_ai_heavy_revenant_retro' has an invalid component id`
 
-If you encounter this error, please notify the mod creator. You will either need to remove meathook or downgrade to a previous version of meathook to resolve the issue.
+This is a problem with version 7.1 of Meathook. If you encounter this error, please download the newest version (v7.2).
 
 ### Changelog
 
