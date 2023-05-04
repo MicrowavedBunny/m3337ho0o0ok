@@ -21,7 +21,7 @@ static uint64_t cs_movemask(T val) {
 
 static unsigned ctz_op(unsigned value) {
 #if IMPL_VECTOR_WIDTH==16
-	return  std::countr_zero(value);
+	return  std::_Countr_zero(value);
 #else
 	return __builtin_ctz(value);
 #endif

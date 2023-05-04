@@ -148,12 +148,12 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ClangCLRelease|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>D:\Program Files (x86)\Steam\steamapps\common\DOOMEternal</OutDir>
+    <OutDir>..\..\..\..\Desktop\meathookbuild</OutDir>
     <TargetName>XINPUT1_3</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ClangCLDebug|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <OutDir>Q:\DOOMEternal_dev_version</OutDir>
+    <OutDir>..\..\..\..\Desktop\meathookbuild</OutDir>
     <TargetName>XINPUT1_3</TargetName>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg">
@@ -290,7 +290,7 @@
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <AdditionalOptions>-flto=full -msse4.1 -msse4.2 -Wl,-plugin-opt=-save-temps %(AdditionalOptions)</AdditionalOptions>
       <AssemblerOutput>All</AssemblerOutput>
-      <AssemblerListingLocation>Q:\DOOMEternal_dev_version\asmout.asm</AssemblerListingLocation>
+      <AssemblerListingLocation>C:\Users\jayz3\Desktop\meathookbuild</AssemblerListingLocation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

@@ -12,6 +12,8 @@
 #include <cstdlib>
 #include <cstdio>
 #include <snaphakalgo.hpp>
+
+//#include "idLib.hpp"
 #if 0
 namespace idMath {
 void SinCos(float a, float& s, float& c)
@@ -115,7 +117,7 @@ void cmd_mh_spawninfo(idCmdArgs* args) {
 	sscanf_s((const char*)cbhandle, "%f %f %f %f %f", &x, &y, &z, &yaw, &pitch);
 	idAngles angles{pitch, yaw, .0};
 	idMat3 mat = angles.ToMat3();
-	const char* fmtstr = "spawnOrientation = {\n\tmat = {\n\t\tmat[0] = {\n\t\t\tx = %f;\n\t\t\ty = %f;\n\t\t\tz = %f;\n\t\t}\n\t\tmat[1] = {\n\t\t\tx = %f;\n\t\t\ty = %f;\n\t\t\tz=%f;\n\t\t}\n\t\tmat[2] = {\n\t\t\tx = %f;\n\t\t\ty = %f;\n\t\t\tz = %f;\n\t\t}\n\t}\n}\nspawnPosition = {\n\tx = %f;\n\ty = %f;\n\tz = %f;\n}";
+	const char* fmtstr = "spawnOrientation = {\n\tmat = {\n\t\tmat[0] = {\n\t\t\tx = %f;\n\t\t\ty = %f;\n\t\t\tz = %f;\n\t\t}\n\t\tmat[1] = {\n\t\t\tx = %f;\n\t\t\ty = %f;\n\t\t\tz = %f;\n\t\t}\n\t\tmat[2] = {\n\t\t\tx = %f;\n\t\t\ty = %f;\n\t\t\tz = %f;\n\t\t}\n\t}\n}\nspawnPosition = {\n\tx = %f;\n\ty = %f;\n\tz = %f;\n}";
 	auto& m = mat.mat;
 	sprintf_s(clipboard_buffer, fmtstr, m[0].x, m[0].y, m[0].z, m[1].x, m[1].y, m[1].z, m[2].x, m[2].y, m[2].z, x, y, z);
 	HGLOBAL mem = GlobalAlloc( GMEM_MOVEABLE, 2048 );
@@ -127,6 +129,77 @@ void cmd_mh_spawninfo(idCmdArgs* args) {
 	SetClipboardData(CF_TEXT,mem);
 	CloseClipboard();
 }
+
+void cmd_mh_offset(idCmdArgs* args) {
+	//handle if no clipboard data
+	if (!OpenClipboard(NULL))
+		return;
+	//get old posi from clipbaod and save it to variables
+	HANDLE cbhandle = GetClipboardData(CF_TEXT);
+	float oldX, oldY, oldZ;
+	sscanf_s((const char*)cbhandle, "%f %f %f", &oldX, &oldY, &oldZ);
+	EmptyClipboard();
+	CloseClipboard();
+
+	//get new position data
+	idCmd::execute_command_text("getviewpos");
+
+	if (!OpenClipboard(NULL))
+		return;
+	
+	cbhandle = GetClipboardData(CF_TEXT);
+
+	float x, y, z;
+
+	sscanf_s((const char*)cbhandle, "%f %f %f", &x, &y, &z);
+
+	//calculate offset
+	float offsetX, offsetY, offsetZ;
+
+	offsetX = (oldX - x) * -1;
+	offsetY = (oldY - y) * -1;
+	offsetZ = (oldZ - z) * -1;
+
+	//idLib::Printf("printing previous pos: %f %f %f\n", oldX, oldY, oldZ);
+	//idLib::Printf("printing current pos: %f %f %f\n", x, y, z);
+	//idLib::Printf("printing offsets: %f %f %f\n", offsetX, offsetY, offsetZ);
+	//format and copy to clipboard
+	const char* fmtstr = "item[] = {\n\t\t\t\t\toffsetDestination = {\n\t\t\t\t\t\tx = %f;\n\t\t\t\t\t\ty = %f;\n\t\t\t\t\t\tz = %f;\n\t\t\t\t\t}\n\t\t\t\t\ttimeSec = 0;\n\t\t\t\t\tspeedSec = 2.5;\n\t\t\t\t}";
+	sprintf_s(clipboard_buffer, fmtstr, offsetX, offsetY, offsetZ);
+	HGLOBAL mem = GlobalAlloc(GMEM_MOVEABLE, 2048);
+	char* str = (char*)GlobalLock(mem);
+
+	memcpy(str, clipboard_buffer, 2048);
+	GlobalUnlock(str);
+	EmptyClipboard();
+	SetClipboardData(CF_TEXT, mem);
+	CloseClipboard();
+}
+
+/*void cmd_mh_offset(idCmdArgs* args) {
+
+	idCmd::execute_command_text("getviewpos");
+
+	if (!OpenClipboard(NULL))
+		return;
+	HANDLE cbhandle = GetClipboardData(CF_TEXT);
+
+	float x, y, z;
+
+	sscanf_s((const char*)cbhandle, "%f %f %f", &x, &y, &z);
+
+	const char* fmtstr = "Offset = {\n\tx = %f\n\ty = %f\n\tz = %f\n}";
+	sprintf_s(clipboard_buffer, fmtstr, x, y, z);
+	HGLOBAL mem = GlobalAlloc(GMEM_MOVEABLE, 2048);
+	char* str = (char*)GlobalLock(mem);
+
+	memcpy(str, clipboard_buffer, 2048);
+	GlobalUnlock(str);
+	EmptyClipboard();
+	SetClipboardData(CF_TEXT, mem);
+	CloseClipboard();
+}*/
+
 
 void cmd_mh_ang2mat(idCmdArgs* args) {
 	double inv1 = .0;

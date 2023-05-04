@@ -25,6 +25,7 @@
 extern
 void cmd_mh_spawninfo(idCmdArgs* args);
 extern void cmd_mh_ang2mat(idCmdArgs* args);
+extern void cmd_mh_offset(idCmdArgs* args);
 /*
 struct idEntityHierarchy {
 	//Offset 8,	 size 48
@@ -236,6 +237,7 @@ void cmd_editor_keys(idCmdArgs* args) {
 }
 void install_editor_cmds() {
 
+	idCmd::register_command("mh_offset", cmd_mh_offset, "Get the x and y offset between two positions copied to clipboard.");
 	idCmd::register_command("mh_spawninfo", cmd_mh_spawninfo, "Copy your current position and orientation, formatted as spawnPosition and spawnOrientation to the clipboard");
 	idCmd::register_command("mh_dumpmap", cmd_mh_dumpmapfile, "Dump current idMapLocal to a .map file.");
 	idCmd::register_command("mh_ang2mat", cmd_mh_ang2mat, "mh_ang2mat pitch yaw roll : converts the pitch, yawand roll values for idAngles to a decl - formatted matrix, copying the result to your clipboard");
